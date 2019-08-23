@@ -1,0 +1,112 @@
+1. basic setup
+2. get data from wordpress
+3. make a list of posts
+4. create pages
+5. get data into the pages
+
+Part 1 basic setup
+
+gatsby new basic-wordpress-to-gatsby-tutorial https://github.com/gatsbyjs/gatsby-starter-hello-world
+
+cd basic-wordpress-to-gatsby-tutorial
+
+code .
+
+npm run develop
+http://localhost:8000/
+
+
+enter bad url to show 404 page to list all created pages
+
+Part 2 get data from wordpress
+
+https://www.gatsbyjs.org/packages/gatsby-source-wordpress/
+
+npm install gatsby-source-wordpress
+
+replace with config from gatsby site
+
+edit plugin in config.js
+domain and ACF
+
+http://localhost:8000/___graphql
+already we have the data in available to us via graphql!!!
+show allWordpressPost and how to query wordpressPost for one post
+
+for simplicity, let's get rid of a bunch of this other config.  
+
+explain making pages in the pages directory and make fake blog page
+    useStaticQuery to get one post
+    insert that into the page
+    explain why this is a terrible time consuming idea
+
+Part 3 make a list of posts
+
+in src/pages, create blog.js
+pages (like in the 404 list we showed) are created by just putting a component in the pages directory, that's all 
+
+no need to restart server, only if change config or node
+
+quickly throw together a Nav for just home and blog listing
+mkdir src/components && touch Navbar.js
+    explain import { Link } from "gatsby" and its syntax
+
+put query into page
+    import {graphql, useStaticQuery} from 'gatsby'
+    copy query from graphiql 
+    useStaticQuery passing the query through graphql
+    this gives us an object that has edges, which is an array of nodes that we can map over
+    save the result to const data = ...
+    map over data to create a list of titles
+    now import Link and make them links
+    check 404 page, they dont exist yet. now we make the pages
+
+Part 4 Create pages
+
+gatsby-node.js (you may need to create this page yourself)
+    find createPages on gatsby docs
+    https://www.gatsbyjs.org/docs/node-apis/
+
+    copy the example and let's modify it
+
+    make templates/blog-post.js just like in the doc
+    demo is getting from markdown but ours is coming from a server so make it async
+    and also save it to a variable instead of returning 
+    replace markdown/frontmatter with our query params
+    add slug to context becuase we want that for later (explain context)
+    restart server
+    it would be better if they were all at /blog/ so lets add that in create pages
+
+Part 5 Get data into the pages
+    open templates/blog-post.js
+    first we need the data so we need graphql again 
+    import {grapql} from 'gatsby'
+    also were not looping this time, we just want one so just query on wordpressPost
+        allWordpressPost can't drill down to single post
+    similar to list page but not using useStaticQuery because it doesn't allow context
+        we'll get to that in a minute
+    make query with query variable in qraphiql > wordpressPost
+        pink are things we can search by, we'll use slug
+        we'll get the slug on each page creation through context so it needs to be dynamic
+        make it a query variable (in pink) and define it down below
+        blue is what can return
+        
+        query ($slug: String!) {
+            wordpressPost(slug: {eq: $slug}) {
+                slug
+                excerpt
+            }
+        }
+        back in blog-post.js
+            put in our new dynamic query save to const result = 
+                also export becuse this allows gatsby access to it to run the query
+                the variable $slug comes from teh context when we created the page 
+                then gatsby provides the result as a prop to the component down below
+                access it like this {props.data.wordpressPost.title}
+
+                ugh, the content is return as a string of html so it diplays the tags! 
+                we need to fix that.  react docs we can  use dangerouslySetInnerHTML
+                https://reactjs.org/docs/dom-elements.html
+
+
+    
