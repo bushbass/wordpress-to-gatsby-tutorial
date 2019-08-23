@@ -17,6 +17,7 @@ http://localhost:8000/
 
 
 enter bad url to show 404 page to list all created pages
+add css
 
 Part 2 get data from wordpress
 
