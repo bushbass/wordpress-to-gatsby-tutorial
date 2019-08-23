@@ -1,6 +1,7 @@
 import React from "react"
 import { graphql } from "gatsby"
 import Navbar from "../components/Navbar"
+import "../styles.css"
 
 export const result = graphql`
   query($slug: String!) {
